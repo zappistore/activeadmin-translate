@@ -10,14 +10,16 @@ module ActiveAdmin
       # @param [Symbol] name the name of the translation association
       # @param [Proc] block the block for the additional inputs
       #
-      def translate_inputs(name = :translations, &block)
+      def translate_inputs(name = :translations, options = {available_locales: ::I18n.available_locales}, &block)
         if self.respond_to?(:form_buffers)
           html = form_buffers.last
         else
           html = "".html_safe
         end
+        available_locales = options.fetch(:available_locales)
+
         html << template.content_tag(:div, :class => "activeadmin-translate #{ translate_id }") do
-          locale_tabs << locale_fields(name, block) << tab_script
+          locale_tabs(available_locales) << locale_fields(name, available_locales, block) << tab_script
         end
       end
 
@@ -36,8 +38,8 @@ module ActiveAdmin
       # @param [Symbol] name the name of the translation association
       # @param [Proc] block the block for the additional inputs
       #
-      def locale_fields(name, block)
-        ::I18n.available_locales.map do |locale|
+      def locale_fields(name, available_locales, block)
+        available_locales.map do |locale|
           translation = object.translation_for(locale)
           translation.instance_variable_set(:@errors, object.errors) if locale == I18n.default_locale
 
@@ -55,9 +57,9 @@ module ActiveAdmin
       #
       # @return [String] the HTML for the locale tabs
       #
-      def locale_tabs
+      def locale_tabs(available_locales)
         template.content_tag(:ul, :class => 'locales') do
-          ::I18n.available_locales.map do |locale|
+          available_locales.map do |locale|
             template.content_tag(:li) do
               template.content_tag(:a, ::I18n.t("active_admin.translate.#{ locale }"), :href => "##{ field_id(locale) }")
             end
