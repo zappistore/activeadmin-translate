@@ -10,13 +10,12 @@ module ActiveAdmin
       # @param [Symbol] name the name of the translation association
       # @param [Proc] block the block for the additional inputs
       #
-      def translate_inputs(name = :translations, options = {available_locales: ::I18n.available_locales}, &block)
+      def translate_inputs(name = :translations, available_locales = ::I18n.available_locales, &block)
         if self.respond_to?(:form_buffers)
           html = form_buffers.last
         else
           html = "".html_safe
         end
-        available_locales = options.fetch(:available_locales)
 
         html << template.content_tag(:div, :class => "activeadmin-translate #{ translate_id }") do
           locale_tabs(available_locales) << locale_fields(name, available_locales, block) << tab_script
