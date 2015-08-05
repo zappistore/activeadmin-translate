@@ -9,17 +9,20 @@ module ActiveAdmin
 
       builder_method :translate_attributes_table_for
 
-      def row(attr, &block)
-        ::I18n.available_locales.each_with_index do |locale, index|
+      def row(attr, available_locales = ::I18n.available_locales, &block)
+        available_locales.each_with_index do |locale, index|
           @table << tr do
             if index == 0
-              th :rowspan => ::I18n.available_locales.length do
+              th :rowspan => available_locales.length do
                 header_content_for(attr)
               end
             end
             @collection.each do |record|
-              td do
-                ::I18n.with_locale locale do
+              ::I18n.with_locale locale do
+                td do
+                  locale
+                end
+                td do
                   content_for(record, block || attr)
                 end
               end
