@@ -39,15 +39,18 @@ module ActiveAdmin
       #
       def locale_fields(name, available_locales, block)
         available_locales.map do |locale|
-          translation = object.translation_for(locale)
-          translation.instance_variable_set(:@errors, object.errors) if locale == I18n.default_locale
-
-          fields = proc do |form|
-            form.input(:locale, :as => :hidden)
-            block.call(form)
+          template.capture do
+            translation = object.translation_for(locale)
+            translation.instance_variable_set(:@errors, object.errors) if locale == I18n.default_locale
+  
+            fields = proc do |form|
+              form.input(:locale, :as => :hidden)
+              block.call(form)
+            end
+            
+            template.assign(has_many_block: true)
+            inputs_for_nested_attributes(:for => [name, translation], :id => field_id(locale), :class => "inputs locale locale-#{ locale }", &fields)
           end
-
-          inputs_for_nested_attributes(:for => [name, translation], :id => field_id(locale), :class => "inputs locale locale-#{ locale }", &fields)
         end.join.html_safe
       end
 
