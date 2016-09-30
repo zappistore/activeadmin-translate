@@ -60,7 +60,7 @@ module ActiveAdmin
         template.content_tag(:ul, :class => 'locales') do
           available_locales.map do |locale|
             template.content_tag(:li) do
-              template.content_tag(:a, ::I18n.t("active_admin.translate.#{ locale }"), :href => "##{ field_id(locale) }")
+              template.content_tag(:a, locale, :href => "##{ field_id(locale) }")
             end
           end.join.html_safe
         end
